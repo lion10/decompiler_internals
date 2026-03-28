@@ -1,6 +1,8 @@
 # Build outputs
 build/
 out/
+logs/
+test_switch/
 
 # Gradle cache
 .gradle/

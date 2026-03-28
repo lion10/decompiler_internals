@@ -17,6 +17,9 @@
 #include "emulate.hh"
 #include "flow.hh"
 
+
+#include <iostream> // Omar: Inserted 
+
 namespace ghidra {
 
 
@@ -2271,6 +2274,9 @@ void JumpTable::clearSavedModel(void)
 void JumpTable::recoverModel(Funcdata *fd)
 
 {
+  // Omar: Inserted
+  std::cerr << "[JT] recoverModel start at " << opaddress << std::endl;
+
   uint4 maxTableSize = fd->getArch()->max_jumptable_size;
   if (jmodel != (JumpModel *)0) {
     if (jmodel->isOverride()) {	// If preexisting model is override
@@ -2291,13 +2297,35 @@ void JumpTable::recoverModel(Funcdata *fd)
   }
   JumpBasic *jbasic = new JumpBasic(this);
   jmodel = jbasic;
-  if (jmodel->recoverModel(fd,indirect,addresstable.size(),maxTableSize))
+
+  // Omar: Inserted
+  std::cerr << "[JT] Trying JumpBasic..." << std::endl;
+
+  if (jmodel->recoverModel(fd,indirect,addresstable.size(),maxTableSize)){
+    // Omar: Inserted
+    std::cerr << "[JT] JumpBasic SUCCESS" << std::endl;
     return;
+  }
+
+  // Omar: Inserted
+  std::cerr << "[JT] JumpBasic FAILED" << std::endl;
+
   jmodel = new JumpBasic2(this);
+
+  // Omar: Inserted
+  std::cerr << "[JT] Trying JumpBasic2..." << std::endl;
+
   ((JumpBasic2 *)jmodel)->initializeStart(jbasic->getPathMeld());
   delete jbasic;
-  if (jmodel->recoverModel(fd,indirect,addresstable.size(),maxTableSize))
-    return;
+  if (jmodel->recoverModel(fd,indirect,addresstable.size(),maxTableSize)){
+    // Omar: Inserted
+    std::cerr << "[JT] JumpBasic2 SUCCESS" << std::endl;
+    return; 
+  }
+  
+  // Omar: Inserted
+  std::cerr << "[JT] JumpBasic2 FAILED" << std::endl;
+
   delete jmodel;
   jmodel = (JumpModel *)0;
 }
